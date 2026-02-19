@@ -27,7 +27,7 @@ async function login() {
 
     try {
 
-        const response = await fetch("http://127.0.0.1:5000/login", {
+        const response = await fetch("https://sales-forecast-app-1.onrender.com/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password })
@@ -68,7 +68,7 @@ async function signup() {
 
     try {
 
-        const response = await fetch("http://127.0.0.1:5000/signup", {
+        const response = await fetch("https://sales-forecast-app-1.onrender.com/signup", {
             method: "POST",
             headers: {"Content-Type":"application/json"},
             body: JSON.stringify({ name, email, password })
@@ -782,7 +782,7 @@ async function analyzeDataset() {
     try {
 
         const response = await fetch(
-            "http://127.0.0.1:8000/forecast",
+            "https://sales-forecast-app-1.onrender.com/forecast",
             {
                 method: "POST",
                 body: formData
@@ -1205,7 +1205,7 @@ async function handleLogin(event) {
 
     try {
 
-        const res = await fetch("http://localhost:5000/login", {
+        const res = await fetch("https://sales-forecast-app-1.onrender.com/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
