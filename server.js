@@ -103,7 +103,26 @@ app.post("/login", async (req, res) => {
     }
 });
 
+const { exec } = require("child_process");
 
+app.post("/forecast", (req, res) => {
+
+    exec("Rscript forecast_api.R", (error, stdout, stderr) => {
+
+        if (error) {
+            console.error(stderr);
+            return res.status(500).json({ error: "R script failed" });
+        }
+
+        try {
+            const result = JSON.parse(stdout);
+            res.json(result);
+        } catch {
+            res.json({ output: stdout });
+        }
+    });
+
+});
 
 
 
@@ -111,3 +130,4 @@ app.post("/login", async (req, res) => {
 app.listen(5000, () => {
     console.log("Server running on port 5000");
 });
+
