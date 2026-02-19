@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sales AI Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<body>
+
+
+
+<div class="dashboard-wrapper">
+
+    <!-- HEADER -->
+    <div class="dashboard-header">
+        <div>
+            <h1>Sales Analytics Dashboard</h1>
+            <p>Welcome, <span id="username"></span></p>
+        </div>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+
+    <!-- UPLOAD SECTION -->
+    <div class="upload-section">
+
+        <h2>Upload Sales Dataset</h2>
+
+        <div class="upload-box" id="uploadBox">
+            <p>Drag & Drop CSV File Here</p>
+            <p>or</p>
+            <label class="browse-btn">
+                Browse File
+                <input type="file" id="dataset" accept=".csv" hidden>
+            </label>
+            <p id="fileName" class="file-name">No file selected</p>
+        </div>
+    
+        <button class="analyze-btn" onclick="processData()">Analyze Dataset</button>
+
+        <p id="uploadStatus"></p>
+
+        <div id="itemSelectorContainer" style="display:none;">
+            <label>Select Item:</label>
+            <select id="itemSelector" multiple size="5" onchange="updateAnalytics()"></select>
+
+        </div>
+    </div>
+    <button class="analyze-btn" onclick="analyzeDataset()">
+    Run AI Forecast
+</button>
+
+    <button class="download-btn" onclick="exportPDF()">
+    Export Dashboard as PDF
+</button>
+
+
+    <div class="dataset-guide">
+
+    <h4>Dataset Requirements</h4>
+
+    <ul>
+        <li>File type: CSV</li>
+        <li>Must contain a Date column</li>
+        <li>Must contain Sales/Revenue values</li>
+        <li>Optional: Item/Product column for multi-item analysis</li>
+        <li>Supports large datasets (daily / weekly / monthly)</li>
+        <li>Additional columns will be ignored automatically</li>
+    </ul>
+
+</div>
+<div id="uploadError" class="upload-error"></div>
+<div id="loadingBox" class="loading-box">
+    <div class="loader"></div>
+    <p>Processing dataset, please wait...</p>
+</div>
+
+
+    <div class="forecast-controls">
+
+    <label for="horizonSelect">Forecast Horizon:</label>
+
+    <select id="horizonSelect" onchange="updateAnalytics()">
+        <option value="3">3 Months</option>
+        <option value="6" selected>6 Months</option>
+        <option value="12">12 Months</option>
+    </select>
+
+</div>
+<button class="download-btn" onclick="downloadReport()">
+    Download Analytics Report
+</button>
+
+<button class="download-btn" onclick="openReportView()">
+    Generate Report View
+</button>
+
+<!-- ================= KPI SECTION ================= -->
+<div class="kpi-grid">
+
+    <div class="kpi-card">
+        <h3>Total Sales</h3>
+        <p id="totalSales" class="empty-value">No Data</p>
+        <span class="kpi-trend positive" id="totalSalesTrend">↑ 0%</span>
+    </div>
+
+    <div class="kpi-card">
+        <h3>Average Sales</h3>
+        <p id="avgSales" class="empty-value">No Data</p>
+        <span class="kpi-trend positive" id="avgSalesTrend">↑ 0%</span>
+    </div>
+
+    <div class="kpi-card">
+        <h3>Total Entries</h3>
+        <p id="totalEntries" class="empty-value">No Data</p>
+        <span class="kpi-trend positive" id="entriesTrend">↑ 0%</span>
+    </div>
+
+    <div class="kpi-card">
+        <h3>Maximum Sale</h3>
+        <p id="maxSale" class="empty-value">No Data</p>
+        <span class="kpi-trend positive" id="maxSaleTrend">↑ 0%</span>
+    </div>
+
+    <div class="kpi-card">
+        <h3>Minimum Sale</h3>
+        <p id="minSale" class="empty-value">No Data</p>
+        <span class="kpi-trend positive" id="minSaleTrend">↑ 0%</span>
+    </div>
+
+    <div class="kpi-card">
+        <h3>Growth Rate</h3>
+        <p id="growthRate" class="empty-value">No Data</p>
+        <span class="kpi-trend positive" id="growthTrend">↑ 0%</span>
+    </div>
+
+</div>
+
+
+<!-- ================= ITEM COMPARISON SECTION ================= -->
+<div class="comparison-section">
+
+    <h2 class="section-title">Item Performance Insights</h2>
+
+    <div class="comparison-grid">
+
+        <div class="comparison-card">
+            <h4>🏆 Top Performing Item</h4>
+            <p id="topItemValue">No Data</p>
+        </div>
+
+        <div class="comparison-card">
+            <h4>📉 Lowest Performing Item</h4>
+            <p id="lowestItemValue">No Data</p>
+        </div>
+
+        <div class="comparison-card">
+            <h4>📊 Most Volatile Item</h4>
+            <p id="volatileItemValue">No Data</p>
+        </div>
+
+        <div class="comparison-card">
+            <h4>🚀 Fastest Growing Item</h4>
+            <p id="growingItemValue">No Data</p>
+        </div>
+
+    </div>
+
+</div>
+
+
+    <!-- PREMIUM CHARTS SECTION -->
+<div class="charts-grid">
+
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3>Monthly Sales</h3>
+            <span class="chart-badge">Bar Chart</span>
+        </div>
+        <canvas id="monthlyChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3>Item Distribution</h3>
+            <span class="chart-badge">Pie Chart</span>
+        </div>
+        <canvas id="pieChart"></canvas>
+    </div>
+
+</div>
+
+<!-- ================= FORECAST SECTION ================= -->
+<div class="forecast-section">
+
+    <div class="forecast-header">
+        <h2>AI Sales Forecast</h2>
+        <span class="forecast-badge">Prediction (Next 6 Months)</span>
+    </div>
+
+    <div class="forecast-chart-box">
+        <canvas id="forecastChart"></canvas>
+        <div id="forecastNoData" class="forecast-no-data">
+            No Data Available
+        </div>
+    </div>
+    <div class="forecast-metrics">
+
+    <div class="metric-card">
+        <h4>Model Accuracy</h4>
+        <p id="metricAccuracy">No Data</p>
+    </div>
+
+    <div class="metric-card">
+        <h4>MAE</h4>
+        <p id="metricMAE">No Data</p>
+    </div>
+
+    <div class="metric-card">
+        <h4>RMSE</h4>
+        <p id="metricRMSE">No Data</p>
+    </div>
+
+    <div class="metric-card">
+        <h4>Model Confidence</h4>
+        <p id="metricConfidence">No Data</p>
+    </div>
+
+</div>
+
+
+</div>
+
+
+<!-- PREMIUM DATASET PREVIEW -->
+<div class="preview-card">
+    <div class="preview-header">
+        <h3>Dataset Preview</h3>
+        <span class="preview-info">Showing first 5 rows</span>
+    </div>
+    <div class="table-wrapper">
+        <table id="previewTable"></table>
+    </div>
+</div>
+
+
+  
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="script.js"></script>
+
+<script>
+    document.getElementById("username").innerText = user;
+</script>
+
+</body>
+
+
+</body>
+</html>
